@@ -7,8 +7,21 @@
     "start": "next dev"
   },
   "dependencies": {
+    "jdown": "^1.0.4",
     "next": "9.5.2",
     "react": "16.13.1",
-    "react-dom": "16.13.1"
+    "react-dom": "16.13.1",
+    "react-typography": "^0.16.19",
+    "typeface-merriweather": "0.0.72",
+    "typeface-open-sans": "0.0.75",
+    "typography": "^0.16.19",
+    "typography-theme-sutro": "^0.16.19"
+  },
+  "devDependencies": {
+    "gray-matter": "^4.0.2",
+    "postcss-import": "^12.0.1",
+    "postcss-preset-env": "^6.7.0",
+    "react-markdown": "^4.3.1",
+    "tailwindcss": "^1.6.3"
   }
 }

@@ -1,45 +1,62 @@
-import React from 'react'
-import Head from 'next/head'
+import fs from "fs";
+import matter from "gray-matter";
+import Layout from "../component/layout";
+import Link from "next/link";
 
-const Home = () => (
-  <div>
-    <h1>Next.js on the [JAMstack](https://jamstack.org)</h1>
+export default function Home({ posts }) {
+  return (
+    <Layout>
+    <div>
+       {posts.map(({ frontmatter: { title, description, date },slug }) => (
+        <article key={slug}>
+          <header>
+          <h3 className="mb-2">
+          <Link href={"/post/[slug]"} as={`/post/${slug}`}>
+                <a className="text-3xl font-semibold text-orange-600 no-underline">
+                  {title}
+                </a>
+            </Link>
+            </h3>
+            <span>{date}</span>
+          </header>
+          <section>
+            <p>{description}</p>
+          </section>
+        </article>
+      ))}
+    </div>
+    </Layout>
+  );
+}
 
-    <h3>Hooray 🎉 - you've built this with <a href="https://nextjs.org">Next.js</a>!</h3>
+export async function getStaticProps() {
+  const files = fs.readdirSync(`${process.cwd()}/content/posts`);
 
-    <style jsx>{`
-      :global(html,body) {
-        margin: 0;
-        padding: 0;
-        height: 100%;
-      }
+  const posts = files.map((filename) => {
+    const markdownWithMetadata = fs
+      .readFileSync(`content/posts/${filename}`)
+      .toString();
 
-      :global(body) {
-        font-size: calc(10px + 1vmin);
-        font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', 'Roboto', 'Oxygen', 'Ubuntu', 'Cantarell', 'Fira Sans',
-          'Droid Sans', 'Helvetica Neue', sans-serif;
-        -webkit-font-smoothing: antialiased;
-        -moz-osx-font-smoothing: grayscale;
+    const { data } = matter(markdownWithMetadata);
 
-        display: flex;
-        flex-direction: column;
-        align-items: center;
-        justify-content: center;
-        text-align: center;
-        background-color: #282c34;
-        color: white;
-      }
+    // Convert post date to format: Month day, Year
+    const options = { year: "numeric", month: "long", day: "numeric" };
+    const formattedDate = data.date.toLocaleDateString("en-US", options);
 
-      a {
-        color: pink;
-        text-decoration: none;
-      }
+    const frontmatter = {
+      ...data,
+      date: formattedDate,
+    };
 
-      .content {
-        padding: 0 32px;
-      }
-    `}</style>
-  </div>
-)
+    return {
+      slug: filename.replace(".md", ""),
+      frontmatter,
+    };
+  });
 
-export default Home
+  return {
+    props: {
+      posts,
+    },
+  };
+}
